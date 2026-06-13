@@ -12,6 +12,7 @@ const statusClass: Record<ComplaintStatus, string> = {
 export default function MyTickets() {
   const [tickets, setTickets] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
+  const [urgeLoadingId, setUrgeLoadingId] = useState<number | null>(null);
 
   useEffect(() => {
     api.getMyComplaints().then(data => {
@@ -19,6 +20,19 @@ export default function MyTickets() {
       setLoading(false);
     });
   }, []);
+
+  const handleUrge = async (ticket: Complaint) => {
+    setUrgeLoadingId(ticket.id);
+    try {
+      const updated = await api.urgeComplaint(ticket.id) as Complaint;
+      setTickets(prev => prev.map(t => t.id === ticket.id ? updated : t));
+      alert('催办成功，请耐心等待处理');
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : '催办失败');
+    } finally {
+      setUrgeLoadingId(null);
+    }
+  };
 
   if (loading) return <div className="container"><p style={{ color: '#999' }}>加载中...</p></div>;
 
@@ -56,7 +70,19 @@ export default function MyTickets() {
                     <td>{t.urged ? <span className="status-tag" style={{ background: '#fff2e8', color: '#d4380d', border: '1px solid #ffbb96' }}>已催办</span> : '-'}</td>
                     <td>{t.rating ? `${t.rating} / 5` : '-'}</td>
                     <td style={{ fontSize: 13 }}>{t.created_at}</td>
-                    <td><Link to={`/ticket/${t.id}`}><button className="btn btn-primary btn-sm">查看</button></Link></td>
+                    <td style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      <Link to={`/ticket/${t.id}`}><button className="btn btn-primary btn-sm">查看</button></Link>
+                      {!t.urged && (t.status === '待受理' || t.status === '处理中') && (
+                        <button
+                          className="btn btn-sm"
+                          style={{ background: '#fff2e8', color: '#d4380d', border: '1px solid #ffbb96' }}
+                          onClick={() => handleUrge(t)}
+                          disabled={urgeLoadingId === t.id}
+                        >
+                          {urgeLoadingId === t.id ? '提交中...' : '催办'}
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
