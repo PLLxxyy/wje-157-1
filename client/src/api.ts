@@ -45,6 +45,8 @@ export const api = {
     request<unknown>(`/complaints/${id}/process`, { method: 'PUT', body: JSON.stringify(data) }),
   rateComplaint: (id: number, rating: number) =>
     request<unknown>(`/complaints/${id}/rate`, { method: 'PUT', body: JSON.stringify({ rating }) }),
+  urgeComplaint: (id: number) =>
+    request<unknown>(`/complaints/${id}/urge`, { method: 'PUT' }),
 
   getStatsByType: () => request<unknown[]>('/admin/stats/by-type'),
   getStatsByRoute: () => request<unknown[]>('/admin/stats/by-route'),

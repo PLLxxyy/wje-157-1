@@ -105,6 +105,32 @@ router.put('/:id/process', authMiddleware, roleGuard('staff'), (req: Request, re
   res.json(updated);
 });
 
+// 催办（乘客，仅待受理/处理中）
+router.put('/:id/urge', authMiddleware, roleGuard('passenger'), (req: Request, res: Response) => {
+  const user = (req as any).user as JwtPayload;
+
+  const complaint = db.prepare('SELECT * FROM complaints WHERE id = ? AND user_id = ?').get(req.params.id, user.id) as Complaint | undefined;
+  if (!complaint) {
+    res.status(404).json({ error: '工单不存在' });
+    return;
+  }
+  if (complaint.status !== '待受理' && complaint.status !== '处理中') {
+    res.status(400).json({ error: '只能对待受理或处理中的工单催办' });
+    return;
+  }
+  if (complaint.urged) {
+    res.status(400).json({ error: '已催办，请耐心等待处理' });
+    return;
+  }
+
+  db.prepare(`
+    UPDATE complaints SET urged = 1, urged_at = datetime('now','localtime'), updated_at = datetime('now','localtime') WHERE id = ?
+  `).run(req.params.id);
+
+  const updated = db.prepare('SELECT c.*, u.username FROM complaints c JOIN users u ON c.user_id = u.id WHERE c.id = ?').get(req.params.id);
+  res.json(updated);
+});
+
 // 满意度评分（乘客）
 router.put('/:id/rate', authMiddleware, roleGuard('passenger'), (req: Request, res: Response) => {
   const user = (req as any).user as JwtPayload;

@@ -40,6 +40,7 @@ export default function MyTickets() {
                   <th>类型</th>
                   <th>线路</th>
                   <th>状态</th>
+                  <th>催办</th>
                   <th>满意度</th>
                   <th>提交时间</th>
                   <th>操作</th>
@@ -52,6 +53,7 @@ export default function MyTickets() {
                     <td><span className="type-tag">{t.type}</span></td>
                     <td>{t.route}</td>
                     <td><span className={`status-tag ${statusClass[t.status]}`}>{t.status}</span></td>
+                    <td>{t.urged ? <span className="status-tag" style={{ background: '#fff2e8', color: '#d4380d', border: '1px solid #ffbb96' }}>已催办</span> : '-'}</td>
                     <td>{t.rating ? `${t.rating} / 5` : '-'}</td>
                     <td style={{ fontSize: 13 }}>{t.created_at}</td>
                     <td><Link to={`/ticket/${t.id}`}><button className="btn btn-primary btn-sm">查看</button></Link></td>

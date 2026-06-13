@@ -30,11 +30,22 @@ db.exec(`
     status TEXT NOT NULL DEFAULT '待受理' CHECK(status IN ('待受理','处理中','已回复')),
     reply TEXT DEFAULT '',
     rating INTEGER CHECK(rating IS NULL OR (rating >= 1 AND rating <= 5)),
+    urged INTEGER NOT NULL DEFAULT 0,
+    urged_at TEXT,
     created_at TEXT DEFAULT (datetime('now','localtime')),
     updated_at TEXT DEFAULT (datetime('now','localtime')),
     FOREIGN KEY (user_id) REFERENCES users(id)
   );
 `);
+
+const columns = db.prepare("PRAGMA table_info(complaints)").all() as { name: string }[];
+const colNames = columns.map(c => c.name);
+if (!colNames.includes('urged')) {
+  db.exec(`ALTER TABLE complaints ADD COLUMN urged INTEGER NOT NULL DEFAULT 0`);
+}
+if (!colNames.includes('urged_at')) {
+  db.exec(`ALTER TABLE complaints ADD COLUMN urged_at TEXT`);
+}
 
 // Seed：如果 users 表为空则插入测试数据
 const userCount = (db.prepare('SELECT COUNT(*) as cnt FROM users').get() as { cnt: number }).cnt;

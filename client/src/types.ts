@@ -21,6 +21,8 @@ export interface Complaint {
   status: ComplaintStatus;
   reply: string;
   rating: number | null;
+  urged: number;
+  urged_at: string | null;
   created_at: string;
   updated_at: string;
   username?: string;

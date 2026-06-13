@@ -102,6 +102,7 @@ export default function StaffDashboard() {
                   <th>线路</th>
                   <th>站点</th>
                   <th>状态</th>
+                  <th>催办</th>
                   <th>提交时间</th>
                   <th>操作</th>
                 </tr>
@@ -115,6 +116,7 @@ export default function StaffDashboard() {
                     <td>{t.route}</td>
                     <td>{t.station}</td>
                     <td><span className={`status-tag ${statusClass[t.status]}`}>{t.status}</span></td>
+                    <td>{t.urged ? <span className="status-tag" style={{ background: '#fff2e8', color: '#d4380d', border: '1px solid #ffbb96' }}>已催办</span> : '-'}</td>
                     <td style={{ fontSize: 13 }}>{t.created_at}</td>
                     <td>
                       <button className="btn btn-primary btn-sm" onClick={() => openModal(t)}>
@@ -136,6 +138,7 @@ export default function StaffDashboard() {
             <h3>处理工单 {modal.ticket_no}</h3>
             <div style={{ marginBottom: 16 }}>
               <p style={{ fontSize: 13, color: '#999' }}>乘客：{modal.username} | 线路：{modal.route} | 站点：{modal.station}</p>
+              {modal.urged && <p style={{ fontSize: 13, color: '#d4380d', marginTop: 4 }}>⚠ 乘客已催办{modal.urged_at ? ` (${modal.urged_at})` : ''}，请尽快处理</p>}
               <p style={{ marginTop: 8, padding: 12, background: '#f9f9f9', borderRadius: 4, fontSize: 14 }}>{modal.description}</p>
             </div>
             <div className="form-group">

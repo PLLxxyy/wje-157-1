@@ -16,6 +16,7 @@ export default function TicketDetail({ user }: Props) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [ratingLoading, setRatingLoading] = useState(false);
+  const [urgeLoading, setUrgeLoading] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -36,6 +37,20 @@ export default function TicketDetail({ user }: Props) {
       alert(err instanceof Error ? err.message : '评分失败');
     } finally {
       setRatingLoading(false);
+    }
+  };
+
+  const handleUrge = async () => {
+    if (!ticket) return;
+    setUrgeLoading(true);
+    try {
+      const updated = await api.urgeComplaint(ticket.id);
+      setTicket(updated as Complaint);
+      alert('催办成功，请耐心等待处理');
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : '催办失败');
+    } finally {
+      setUrgeLoading(false);
     }
   };
 
@@ -96,12 +111,30 @@ export default function TicketDetail({ user }: Props) {
               </span>
             </span>
           </div>
+          {ticket.urged ? (
+            <div className="detail-row">
+              <span className="detail-label">催办状态</span>
+              <span className="detail-value">
+                <span className="status-tag" style={{ background: '#fff2e8', color: '#d4380d', border: '1px solid #ffbb96' }}>已催办</span>
+                {ticket.urged_at && <span style={{ fontSize: 12, color: '#999', marginLeft: 8 }}>{ticket.urged_at}</span>}
+              </span>
+            </div>
+          ) : null}
         </div>
 
         <h3>问题描述</h3>
         <p style={{ background: '#f9f9f9', padding: 16, borderRadius: 6, marginBottom: 20, fontSize: 14, lineHeight: 1.8 }}>
           {ticket.description}
         </p>
+
+        {/* 催办按钮（仅乘客，待受理/处理中且未催办） */}
+        {user.role === 'passenger' && !ticket.urged && (ticket.status === '待受理' || ticket.status === '处理中') && (
+          <div style={{ marginTop: 20 }}>
+            <button className="btn btn-primary" onClick={handleUrge} disabled={urgeLoading}>
+              {urgeLoading ? '提交中...' : '催办'}
+            </button>
+          </div>
+        )}
 
         {/* 回复区域 */}
         {ticket.reply && (
