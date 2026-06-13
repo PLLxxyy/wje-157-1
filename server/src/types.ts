@@ -1,0 +1,38 @@
+export type Role = 'passenger' | 'staff' | 'admin';
+
+export interface User {
+  id: number;
+  username: string;
+  password: string;
+  role: Role;
+  created_at: string;
+}
+
+export type ComplaintType = '司机态度' | '到站不准时' | '车厢卫生' | '站点设施损坏' | '其他建议';
+export type ComplaintStatus = '待受理' | '处理中' | '已回复';
+
+export interface Complaint {
+  id: number;
+  ticket_no: string;
+  user_id: number;
+  type: ComplaintType;
+  description: string;
+  route: string;
+  station: string;
+  incident_time: string;
+  status: ComplaintStatus;
+  reply: string;
+  rating: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ComplaintWithUsername extends Complaint {
+  username: string;
+}
+
+export interface JwtPayload {
+  id: number;
+  username: string;
+  role: Role;
+}

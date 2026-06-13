@@ -1,0 +1,14 @@
+{
+  "name": "bus-complaint-platform",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "dev": "concurrently -n server,client -c blue,green \"cd server && PORT=3203 npm run dev\" \"cd client && VITE_PORT=5175 VITE_API_PORT=3203 npm run dev\"",
+    "build": "cd client && npm run build",
+    "start": "cd server && PORT=3203 npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
